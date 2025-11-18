@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<!-- Expense Tracking Web - CPIS358 Project (HTML + CSS + JS) -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Expense Tracking Web</title>
+    <meta name="description" content="Simple HTML5 expense tracking website for CPIS358 project.">
+    <meta name="keywords" content="HTML5, CSS, JavaScript, Expense Tracking, CPIS358">
+    <meta name="author" content="Mohammed Alamoudi_Khalid Hakami">
+
+    <!-- External CSS -->
+    <link rel="stylesheet" type="text/css" href="styles.css">
+
+    <!-- Internal CSS -->
+    <style type="text/css">
+        #tipsArea {
+            margin-top: 10px;
+            padding: 8px;
+            border: 1px dotted #999;
+            background-color: #fdfdfd;
+        }
+    </style>
+
+    <!-- JavaScript -->
+    <script type="text/javascript">
+
+        var expenseTotal = 0;
+        var expenseCount = 0;
+
+        // دخل المستخدم + المدفوعات الشهرية
+        var incomeAmount = 0;
+        var fixedTotal = 0;
+        var fixedCount = 0;
+
+        // هذا متغير عشان تتغير الصورة الي فوق مع الزر
+        var moodImageIndex = 1;
+
+        function welcomeUser() {
+            var name = prompt("Please enter your name:", "");
+
+            if (name === null || name === "") {
+                name = "Guest";
+            }
+
+            document.getElementById("welcomeMessage").innerHTML =
+                "Welcome, " + name + "! This is your Expense Tracking Web.";
+        }
+
+        // هنا استخدمت المتغير 
+        function StartWithExpenseTrackingWeb() {
+            var img = document.getElementById("moodImage");
+
+            if (moodImageIndex === 1) {
+                img.src = "C:\\Users\\navyg\\OneDrive\\Desktop\\budget2.jpg";  //  2nd pic
+                moodImageIndex = 2;
+            } else {
+                img.src = "C:\\Users\\navyg\\OneDrive\\Desktop\\budget1.png";  //  1st pic
+                moodImageIndex = 1;
+            }
+        }
+
+        function showSavingTips() {
+            var tipsText = "<ul>";
+            var i;
+
+            for (i = 1; i <= 3; i = i + 1) {
+                if (i === 1) {
+                    tipsText = tipsText + "<li>Write down all your daily expenses.</li>";
+                } else if (i === 2) {
+                    tipsText = tipsText + "<li>Set a clear monthly budget limit.</li>";
+                } else {
+                    tipsText = tipsText + "<li>Avoid buying non-essential items.</li>";
+                }
+            }
+
+            tipsText = tipsText + "</ul>";
+            document.getElementById("tipsArea").innerHTML = tipsText;
+        }
+
+        function addExpense() {
+            var amountStr = document.getElementById("amount").value;
+            var dateStr = document.getElementById("expenseDate").value;
+            var category = document.getElementById("category").value;
+
+            if (amountStr === "" || parseFloat(amountStr) <= 0) {
+                alert("Please enter a valid amount.");
+                return false;
+            }
+
+            if (dateStr === "") {
+                alert("Please enter a date.");
+                return false;
+            }
+
+            if (category === "") {
+                alert("Please enter or select a category.");
+                return false;
+            }
+
+            var amount = parseFloat(amountStr);
+
+            expenseCount = expenseCount + 1;
+            expenseTotal = expenseTotal + amount;
+
+            var tableBody = document.getElementById("expenseTableBody");
+            
+            tableBody.innerHTML = tableBody.innerHTML +
+                "<tr><td>" + expenseCount + "</td>" +
+                "<td>" + amount.toFixed(2) + "</td>" +
+                "<td>" + category + "</td>" +
+                "<td>" + dateStr + "</td></tr>";
+
+            document.getElementById("totalAmount").innerHTML = expenseTotal.toFixed(2);
+
+            var totalRow = document.getElementById("totalRow");
+            if (expenseTotal > 500) {
+                totalRow.style.color = "red";
+            } else {
+                totalRow.style.color = "black";
+            }
+
+            
+            updateSummaryTotals();
+
+            return false;
+        }
+
+        // إضافة دخل + دفعة شهرية
+        function addFixedPayment() {
+            var incomeStr = document.getElementById("income").value;
+            var payName = document.getElementById("paymentName").value;
+            var payAmountStr = document.getElementById("paymentAmount").value;
+
+            // لو المستخدم كتب دخل، نحدّثه
+            if (incomeStr !== "") {
+                var newIncome = parseFloat(incomeStr);
+                if (isNaN(newIncome) || newIncome <= 0) {
+                    alert("Please enter a valid positive income.");
+                    return false;
+                }
+                incomeAmount = newIncome;
+            }
+
+            if (payName === "") {
+                alert("Please enter payment name.");
+                return false;
+            }
+
+            if (payAmountStr === "" || parseFloat(payAmountStr) <= 0) {
+                alert("Please enter a valid payment amount.");
+                return false;
+            }
+
+            var payAmount = parseFloat(payAmountStr);
+
+            fixedCount = fixedCount + 1;
+            fixedTotal = fixedTotal + payAmount;
+
+            var fixedBody = document.getElementById("fixedTableBody");
+
+            fixedBody.innerHTML = fixedBody.innerHTML +
+                "<tr><td>" + fixedCount + "</td>" +
+                "<td>" + payName + "</td>" +
+                "<td>" + payAmount.toFixed(2) + "</td></tr>";
+
+            document.getElementById("fixedTotalAmount").innerHTML = fixedTotal.toFixed(2);
+
+            
+            updateSummaryTotals();
+
+            return false;
+        }
+
+      
+        function updateSummaryTotals() {
+            var summaryIncome = document.getElementById("summaryIncome");
+            var summaryFixed = document.getElementById("summaryFixed");
+            var summaryExpenses = document.getElementById("summaryExpenses");
+            var summaryGrand = document.getElementById("summaryGrand");
+
+            summaryIncome.innerHTML = incomeAmount.toFixed(2);
+            summaryFixed.innerHTML = fixedTotal.toFixed(2);
+            summaryExpenses.innerHTML = expenseTotal.toFixed(2);
+
+            var grandTotal = fixedTotal + expenseTotal;
+            summaryGrand.innerHTML = grandTotal.toFixed(2);
+        }
+
+        function validateLoginForm() {
+            var email = document.getElementById("loginEmail").value;
+            var pass = document.getElementById("loginPassword").value;
+
+            if (email === "" || pass === "") {
+                alert("Please fill all fields.");
+                return false;
+            }
+
+            if (pass.length < 6) {
+                alert("Password must be at least 6 characters.");
+                return false;
+            }
+
+            alert("Login submitted (demo).");
+            return false;
+        }
+
+        function validateSignupForm() {
+            var name = document.getElementById("fullName").value;
+            var email = document.getElementById("signupEmail").value;
+            var pass = document.getElementById("signupPassword").value;
+            var agree = document.getElementById("agree");
+
+            if (name === "" || email === "" || pass === "") {
+                alert("Please fill all required fields.");
+                return false;
+            }
+
+            if (pass.length < 6) {
+                alert("Password must be 6 or more characters.");
+                return false;
+            }
+
+            if (!agree.checked) {
+                alert("You must agree to the terms.");
+                return false;
+            }
+
+            alert("Account created (demo).");
+            return false;
+        }
+
+        function fieldFocus(f) {
+            f.style.backgroundColor = "#ffffe0";
+        }
+
+        function fieldBlur(f) {
+            f.style.backgroundColor = "#ffffff";
+        }
+
+    </script>
+
+</head>
+
+<body onload="welcomeUser()">
+
+    <header>
+        <!--   لو تضغط ع صورة الفلوس الي ف الركن يوديك ع صفحة اباوت-->
+        <img src="C:\Users\navyg\OneDrive\Desktop\expense_logo.png" alt="Logo" width="60" height="60" usemap="#projectMap">
+        <map name="projectMap">
+            
+            <area shape="rect" coords="0,0,60,60" href="about.html" alt="About Expense Tracking Web">
+        </map>
+
+        <!-- Inline CSS -->
+        <h1 style="color:#ecf0f1;">Expense Tracking Web</h1>
+        <time>2025-11-15</time>
+        <p id="welcomeMessage"></p>
+
+        <nav>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#add-expense">Add Expense</a></li>
+                <li><a href="#login">Login</a></li>
+                <li><a href="#signup">Signup</a></li>
+                <li><a href="#summary-table">Summary</a></li>
+                <li><a href="about.html">About</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- HOME SECTION -->
+    <section id="home" class="card">
+        <h2>Track your money, and be rich</h2>
+        <p>
+            This website helps you record your expenses and see your total spending in a simple way.
+            You can also login and signup as a basic simulation for a real system.
+        </p>
+
+        <!-- Dynamic Picture -->
+        <figure>
+            <img id="moodImage" src="C:\Users\navyg\OneDrive\Desktop\budget1.png" alt="Budget Picture" width="260" height="160">
+            <figcaption>Track your expenses and become rich.</figcaption>
+        </figure>
+
+        <p>
+            <input type="button" value="Start With Expense Tracking Web" onclick="StartWithExpenseTrackingWeb()">
+        </p>
+
+        <div id="tipsArea"></div>
+        <p>
+            <input type="button" value="Show Saving Tips" onclick="showSavingTips()">
+        </p>
+    </section>
+
+    <!-- SIGNUP -->
+    <section id="signup" class="card">
+        <h2>Signup</h2>
+
+        <form onsubmit="return validateSignupForm()">
+
+            <p>
+                <label>Full Name:</label><br>
+                <input type="text" id="fullName" onfocus="fieldFocus(this)" onblur="fieldBlur(this)">
+            </p>
+
+            <p>
+                <label>Email:</label><br>
+                <input type="email" id="signupEmail" onfocus="fieldFocus(this)" onblur="fieldBlur(this)">
+            </p>
+
+            <p>
+                <label>Password:</label><br>
+                <input type="password" id="signupPassword" onfocus="fieldFocus(this)" onblur="fieldBlur(this)">
+            </p>
+
+            <p>
+                <label><input type="checkbox" id="agree"> I agree</label>
+            </p>
+
+            <input type="submit" value="Create Account">
+            <input type="reset" value="Clear">
+
+        </form>
+    </section>
+
+    <!-- LOGIN -->
+    <section id="login" class="card">
+        <h2>Login</h2>
+
+        <form onsubmit="return validateLoginForm()">
+
+            <p>
+                <label>Email:</label><br>
+                <input type="email" id="loginEmail" onfocus="fieldFocus(this)" onblur="fieldBlur(this)">
+            </p>
+
+            <p>
+                <label>Password:</label><br>
+                <input type="password" id="loginPassword" onfocus="fieldFocus(this)" onblur="fieldBlur(this)">
+            </p>
+
+            <input type="submit" value="Login">
+            <input type="reset" value="Clear">
+        </form>
+    </section>
+
+    <!-- INCOME & MONTHLY PAYMENTS  -->
+    <section id="income-payments" class="card">
+        <h2>Income & Monthly Payments</h2>
+
+        <form onsubmit="return addFixedPayment();">
+
+            <p>
+                <label>Monthly Income (SAR):</label><br>
+                <input type="number" id="income" onfocus="fieldFocus(this)" onblur="fieldBlur(this)">
+            </p>
+
+            <p>
+                <label>Payment Name:</label><br>
+                <input type="text" id="paymentName" onfocus="fieldFocus(this)" onblur="fieldBlur(this)">
+            </p>
+
+            <p>
+                <label>Payment Amount (SAR):</label><br>
+                <input type="number" id="paymentAmount" onfocus="fieldFocus(this)" onblur="fieldBlur(this)">
+            </p>
+
+            <input type="submit" value="Add Payment">
+            <input type="reset" value="Clear">
+
+        </form>
+
+        <h3>Your Monthly Payments</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Payment Name</th>
+                    <th>Amount (SAR)</th>
+                </tr>
+            </thead>
+            <tbody id="fixedTableBody">
+            </tbody>
+        </table>
+
+        <p>
+            Monthly Payments Total: <span id="fixedTotalAmount">0.00</span> SAR
+        </p>
+    </section>
+
+    <!-- ADD EXPENSE -->
+    <section id="add-expense" class="card">
+        <h2>Add New Expense</h2>
+
+        <form onsubmit="return addExpense();">
+
+            <p>
+                <label>Amount (SAR):</label><br>
+                <input type="number" id="amount" onfocus="fieldFocus(this)" onblur="fieldBlur(this)">
+            </p>
+
+            <p>
+                <label>Date:</label><br>
+                <input type="date" id="expenseDate" onfocus="fieldFocus(this)" onblur="fieldBlur(this)">
+            </p>
+
+            <p>
+                <label>Category:</label><br>
+                <input type="text" id="category" list="catlist" onfocus="fieldFocus(this)" onblur="fieldBlur(this)">
+                <datalist id="catlist">
+                    <option value="Food"/>
+                    <option value="Transport"/>
+                    <option value="Entertainment"/>
+                    <option value="Shopping"/>
+                    <option value="Pills"/>
+                </datalist>
+            </p>
+
+            <p>
+                <label>Notes:</label><br>
+                <textarea id="notes"></textarea>
+            </p>
+
+            <input type="submit" value="Add Expense">
+            <input type="reset" value="Clear">
+
+        </form>
+
+        <h3>Your Expenses</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Amount</th>
+                    <th>Category</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+
+            <tbody id="expenseTableBody">
+            </tbody>
+        </table>
+
+        <p id="totalRow">
+            Total: <span id="totalAmount">0.00</span> SAR
+        </p>
+
+    </section>
+
+    <!-- SUMMARY -->
+    <section id="summary-table" class="card">
+        <h2>Summary</h2>
+
+        <table>
+            <tbody>
+                <tr>
+                    <th>Income</th>
+                    <td><span id="summaryIncome">0.00</span> SAR</td>
+                </tr>
+                <tr>
+                    <th>Fixed Payments Total</th>
+                    <td><span id="summaryFixed">0.00</span> SAR</td>
+                </tr>
+                <tr>
+                    <th>Expenses Total</th>
+                    <td><span id="summaryExpenses">0.00</span> SAR</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>Overall Total (Fixed + Expenses)</th>
+                    <td><span id="summaryGrand">0.00</span> SAR</td>
+                </tr>
+            </tfoot>
+        </table>
+    </section>
+
+    <footer>
+        <h6>&copy; 2025 Expense Tracking Web</h6>
+        <address>Contact: navygodzilla@gmail.com</address>
+        <address>Contact: Hakamkkhaled@gmail.com</address>
+    </footer>
+
+</body>
+</html>
